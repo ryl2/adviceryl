@@ -124,7 +124,7 @@ function displaySearchResults(results, query) {
               <h3>${result.title}</h3>
               <p><strong>Problem:</strong> ${result.problem}</p>
               <p>${result.description}</p>
-              <a href="/advice/pages/${result.categoryId}.html" class="back-btn" style="display: inline-block; margin-top: 1rem;">
+              <a href="/pages/${result.categoryId}.html" class="back-btn" style="display: inline-block; margin-top: 1rem;">
                 View Full Guide →
               </a>
             </div>
@@ -183,7 +183,7 @@ function displayMoodSuggestions(mood) {
       <p style="font-size: 1.1rem; margin-bottom: 1.5rem;">Feeling <strong>${mood}</strong>? Here are some guides that might help:</p>
       <div style="display: grid; gap: 1rem;">
         ${suggestions.map(cat => `
-          <a href="/advice/pages/${cat.id}.html" class="mood-suggestion-card">
+          <a href="/pages/${cat.id}.html" class="mood-suggestion-card">
             <span style="font-size: 2rem;">${cat.emoji}</span>
             <span>${cat.title}</span>
             →
@@ -196,7 +196,7 @@ function displayMoodSuggestions(mood) {
 
 // Category Navigation
 function navigateToCategory(categoryId) {
-  window.location.href = `/advice/pages/${categoryId}.html`;
+  window.location.href = `/pages/${categoryId}.html`;
 }
 
 // Collapsible Advice Items
@@ -398,3 +398,4 @@ function setupCategoryCards() {
 }
 
 document.addEventListener('DOMContentLoaded', setupCategoryCards);
+
