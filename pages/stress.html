@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Stress Management - Life Advice Guide</title>
+  <link rel="stylesheet" href="../assets/css/style.css">
+</head>
+<body>
+  <header>
+    <nav>
+      <a href="../index.html" class="logo">💡 Life Guide</a>
+      <div class="search-container">
+        <input type="text" id="search-input" class="search-input" placeholder="Search advice topics...">
+      </div>
+      <div class="nav-controls">
+        <button id="theme-toggle" class="theme-toggle">🌙</button>
+        <button id="menu-toggle" class="menu-toggle"><span></span><span></span><span></span></button>
+      </div>
+    </nav>
+  </header>
+  <main>
+    <div class="container">
+      <a href="../index.html" class="back-btn">← Back to Categories</a>
+      <div class="page-header" id="page-header"></div>
+      <section class="advice-list" id="advice-list"></section>
+    </div>
+  </main>
+  <footer>
+    <p>💚 Take care of yourself. You deserve it.</p>
+    <p style="font-size: 0.9rem; margin-top: 1rem;">Created to help you navigate life's challenges with wisdom and compassion.</p>
+  </footer>
+  <script src="../assets/js/data.js"></script>
+  <script src="../assets/js/main.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const path = window.location.pathname;
+      const match = path.match(/\/pages\/([^.]+)\.html/);
+      const categoryId = match ? match[1] : null;
+      const category = adviceData[categoryId];
+      const items = category ? category.advice || [] : [];
+      document.title = category ? category.title + ' - Life Advice Guide' : 'Life Advice Guide';
+      const header = document.getElementById('page-header');
+      if (category) {
+        header.innerHTML = `<span class="page-icon">${category.emoji}</span><div><h1>${category.title}</h1><p class="lead">Practical tips and reflections for ${category.title.toLowerCase()}.</p></div>`;
+      }
+      const listContainer = document.getElementById('advice-list');
+      if (items.length > 0) {
+        listContainer.innerHTML = items.map((item) => `<article class="advice-item collapsed" data-id="${item.id}"><header class="advice-title" role="button" tabindex="0"><h3>${item.title}</h3><div class="advice-title-right"><button class="bookmark-btn" data-id="${item.id}">🔖</button><span class="collapse-icon">▶</span></div></header><div class="advice-content" hidden><p class="advice-problem"><strong>Problem:</strong> ${item.problem}</p><p class="advice-description">${item.description}</p><h4>Steps to Take</h4><ol class="advice-steps">${item.steps.map(step => `<li>${step}</li>`).join('')}</ol>${item.reflection ? `<div class="advice-reflection"><strong>Reflect:</strong> ${item.reflection}</div>` : ''}${item.quote ? `<blockquote class="advice-quote">${item.quote}</blockquote>` : ''}</div></article>`).join('');
+      } else {
+        listContainer.innerHTML = '<p style="text-align: center; padding: 2rem;">No advice items found.</p>';
+      }
+      if (typeof setupCollapsibleItems === 'function') setupCollapsibleItems();
+      if (typeof setupBookmarking === 'function') setupBookmarking();
+    });
+  </script>
+</body>
+</html>

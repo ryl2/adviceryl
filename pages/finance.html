@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Life Advice Guide</title>
+  <link rel="stylesheet" href="../assets/css/style.css" />
+</head>
+<body>
+  <header>
+    <nav>
+      <a href="../index.html" class="logo">💡 Life Guide</a>
+      <div class="search-container">
+        <input type="text" id="search-input" class="search-input" placeholder="Search advice topics..." />
+      </div>
+      <div class="nav-controls">
+        <button id="theme-toggle" class="theme-toggle" title="Toggle dark mode">🌙</button>
+        <button id="menu-toggle" class="menu-toggle" title="Toggle menu"><span></span><span></span><span></span></button>
+      </div>
+    </nav>
+  </header>
+
+  <main>
+    <div class="container">
+      <a href="../index.html" class="back-btn">← Back to Categories</a>
+      <div class="page-header" id="page-header"></div>
+      <section class="advice-list" id="advice-list"></section>
+    </div>
+  </main>
+
+  <footer>
+    <p>💚 Take care of yourself. You deserve it.</p>
+  </footer>
+
+  <script src="../assets/js/data.js"></script>
+  <script src="../assets/js/main.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const path = window.location.pathname;
+      const match = path.match(/\/pages\/([^.]+)\.html/);
+      const categoryId = match ? match[1] : null;
+      const category = adviceData[categoryId];
+      const items = (category && category.advice) || [];
+      document.title = category ? category.title + ' - Life Advice Guide' : 'Life Advice Guide';
+
+      const header = document.getElementById('page-header');
+      if (category) {
+        header.innerHTML = `<span class="page-icon" aria-hidden="true">${category.emoji}</span><div><h1>${category.title}</h1><p class="lead">Practical tips and reflections for ${category.title.toLowerCase()}.</p></div>`;
+      }
+
+      const list = document.getElementById('advice-list');
+      if (!category) {
+        list.innerHTML = '<p style="text-align: center; padding: 2rem;">Category not found. <a href="../index.html">Return home</a></p>';
+        return;
+      }
+      if (!items.length) {
+        list.innerHTML = '<p>No advice items found for this category yet.</p>';
+      } else {
+        list.innerHTML = items.map(item => `<article class="advice-item collapsed" data-id="${item.id}" aria-expanded="false"><header class="advice-title" role="button" tabindex="0" aria-controls="content-${item.id}"><h3>${item.title}</h3><div class="advice-title-right"><button class="bookmark-btn" data-id="${item.id}" aria-label="Bookmark ${item.title}">🔖</button><span class="collapse-icon" aria-hidden="true">▶</span></div></header><div id="content-${item.id}" class="advice-content" hidden><p class="advice-problem"><strong>Problem:</strong> ${item.problem}</p><p class="advice-description">${item.description}</p><h4>Steps to Take</h4><ol class="advice-steps">${(item.steps||[]).map(s=>`<li>${s}</li>`).join('')}</ol>${item.reflection?`<div class="advice-reflection"><strong>Reflect:</strong> ${item.reflection}</div>`:''}${item.quote?`<blockquote class="advice-quote">${item.quote}</blockquote>`:''}</div></article>`).join('');
+      }
+
+      if (typeof setupCollapsibleItems === 'function') setupCollapsibleItems();
+      else {
+        document.querySelectorAll('.advice-title').forEach(h => {
+          h.addEventListener('click', () => {
+            const article = h.closest('.advice-item');
+            const content = article.querySelector('.advice-content');
+            const isOpen = !content.hidden;
+            content.hidden = isOpen;
+            article.classList.toggle('expanded', !isOpen);
+            article.classList.toggle('collapsed', isOpen);
+            article.setAttribute('aria-expanded', !isOpen ? 'true' : 'false');
+          });
+          h.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') h.click(); });
+        });
+      }
+
+      if (typeof setupBookmarking === 'function') setupBookmarking();
+      else {
+        document.querySelectorAll('.bookmark-btn').forEach(btn => {
+          btn.addEventListener('click', e => {
+            e.stopPropagation();
+            const id = btn.dataset.id;
+            const item = items.find(i => i.id === id);
+            if (!item) return;
+            if (typeof isBookmarked === 'function' && isBookmarked(id)) {
+              if (typeof removeBookmark === 'function') removeBookmark(id);
+              btn.classList.remove('bookmarked');
+            } else {
+              if (typeof saveBookmark === 'function') saveBookmark(Object.assign({},item,{category:categoryId}));
+              btn.classList.add('bookmarked');
+            }
+          });
+        });
+        if (typeof getAllBookmarks === 'function') {
+          const bm = getAllBookmarks();
+          document.querySelectorAll('.bookmark-btn').forEach(b => { if (bm.some(x=>x.id===b.dataset.id)) b.classList.add('bookmarked'); });
+        }
+      }
+    });
+  </script>
+</body>
+</html>
